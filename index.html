@@ -79,8 +79,10 @@
   /* ---------- svg animations ---------- */
   .float{animation:float 5s ease-in-out infinite}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-  .tail{transform-origin:75% 80%;animation:slap 2.2s ease-in-out infinite}
-  @keyframes slap{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-22deg)}80%{transform:rotate(4deg)}}
+  .hop{animation:hop 1.6s cubic-bezier(.4,0,.6,1) infinite}
+  @keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}12%{transform:translateY(2px) scale(1.04,.94)}40%{transform:translateY(-26px) scale(.97,1.04)}70%{transform:translateY(0) scale(1,1)}82%{transform:translateY(1px) scale(1.03,.96)}}
+  .nod{transform-origin:50% 85%;animation:nod 2.4s ease-in-out infinite}
+  @keyframes nod{0%,100%{transform:rotate(0)}30%{transform:rotate(7deg)}60%{transform:rotate(-4deg)}}
   .ripple{animation:ripple 3s ease-out infinite;transform-origin:center}
   @keyframes ripple{0%{opacity:.8;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
   .cloud{animation:drift 40s linear infinite}
@@ -139,17 +141,25 @@
       <rect x="430" y="250" width="65" height="14" rx="7" fill="#5e3a1e" transform="rotate(-6 462 257)"/>
     </g>
     <!-- beaver -->
-    <g class="float">
-      <ellipse class="tail" cx="470" cy="235" rx="42" ry="16" fill="#5e3a1e"/>
+    <g class="hop">
+      <ellipse cx="448" cy="228" rx="38" ry="15" fill="#5e3a1e"/>
       <ellipse cx="400" cy="210" rx="55" ry="45" fill="#8a5a33"/>
-      <circle cx="400" cy="160" r="32" fill="#8a5a33"/>
-      <circle cx="386" cy="132" r="10" fill="#8a5a33"/>
-      <circle cx="414" cy="132" r="10" fill="#8a5a33"/>
-      <circle cx="389" cy="155" r="4.5" fill="#2b1c0e"/>
-      <circle cx="411" cy="155" r="4.5" fill="#2b1c0e"/>
-      <ellipse cx="400" cy="168" rx="8" ry="6" fill="#3a2a1a"/>
-      <rect x="394" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
-      <rect x="401" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
+      <g class="nod">
+        <circle cx="400" cy="160" r="32" fill="#8a5a33"/>
+        <circle cx="386" cy="132" r="10" fill="#8a5a33"/>
+        <circle cx="414" cy="132" r="10" fill="#8a5a33"/>
+        <circle cx="389" cy="155" r="4.5" fill="#2b1c0e"/>
+        <circle cx="411" cy="155" r="4.5" fill="#2b1c0e"/>
+        <ellipse cx="400" cy="168" rx="8" ry="6" fill="#3a2a1a"/>
+        <rect x="394" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
+        <rect x="401" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
+        <!-- top hat -->
+        <g transform="rotate(-8 400 125)">
+          <rect x="374" y="122" width="52" height="8" rx="4" fill="#2b2b33"/>
+          <rect x="383" y="94" width="34" height="30" rx="4" fill="#2b2b33"/>
+          <rect x="383" y="112" width="34" height="7" fill="#f4a83f"/>
+        </g>
+      </g>
     </g>
   </svg>
   <h1>Beaverville</h1>
@@ -202,6 +212,12 @@
       <circle cx="410" cy="145" r="26" fill="#8a5a33"/>
       <circle cx="404" cy="140" r="4" fill="#2b1c0e"/>
       <rect x="416" y="152" width="5" height="9" rx="2" fill="#fff"/>
+      <!-- tiny top hat -->
+      <g transform="rotate(-14 410 120)">
+        <rect x="390" y="120" width="40" height="6" rx="3" fill="#2b2b33"/>
+        <rect x="397" y="99" width="26" height="23" rx="3" fill="#2b2b33"/>
+        <rect x="397" y="113" width="26" height="5" fill="#f4a83f"/>
+      </g>
     </g>
     <rect x="430" y="160" width="140" height="22" rx="11" fill="#a8703f"/>
     <ellipse class="ripple" cx="380" cy="255" rx="60" ry="9" fill="none" stroke="#bfe8f5" stroke-width="3"/>
@@ -224,14 +240,22 @@
 <section>
   <svg class="scene reveal" viewBox="0 0 800 260" role="img" aria-label="Beaver waving under the moon">
     <circle cx="640" cy="60" r="34" fill="#fdf6d8"/>
-    <g class="float">
+    <g class="hop" style="animation-delay:.3s">
+      <ellipse cx="356" cy="196" rx="34" ry="14" fill="#5e3a1e"/>
       <ellipse cx="400" cy="180" rx="50" ry="42" fill="#8a5a33"/>
-      <circle cx="400" cy="132" r="30" fill="#8a5a33"/>
-      <circle cx="390" cy="128" r="4" fill="#2b1c0e"/>
-      <circle cx="410" cy="128" r="4" fill="#2b1c0e"/>
-      <rect x="393" y="145" width="5" height="9" rx="2" fill="#fff"/>
-      <rect x="400" y="145" width="5" height="9" rx="2" fill="#fff"/>
-      <ellipse class="tail" cx="330" cy="150" rx="14" ry="30" fill="#5e3a1e"/>
+      <g class="nod">
+        <circle cx="400" cy="132" r="30" fill="#8a5a33"/>
+        <circle cx="390" cy="128" r="4" fill="#2b1c0e"/>
+        <circle cx="410" cy="128" r="4" fill="#2b1c0e"/>
+        <rect x="393" y="145" width="5" height="9" rx="2" fill="#fff"/>
+        <rect x="400" y="145" width="5" height="9" rx="2" fill="#fff"/>
+        <!-- top hat -->
+        <g transform="rotate(7 400 100)">
+          <rect x="376" y="98" width="48" height="7" rx="3.5" fill="#2b2b33"/>
+          <rect x="384" y="72" width="32" height="28" rx="4" fill="#2b2b33"/>
+          <rect x="384" y="89" width="32" height="6" fill="#e05c4b"/>
+        </g>
+      </g>
     </g>
   </svg>
   <div class="card reveal d1">
