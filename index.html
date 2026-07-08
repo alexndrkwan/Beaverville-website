@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Beaverville — Beavers vs Humans</title>
+<meta name="description" content="Beaverville: a whimsical game of beavers, dams, and the humans who dare disturb them. Coming to Steam.">
+<style>
+  :root{
+    --sky1:#8ed8f8; --sky2:#fdf2c9;
+    --water:#4aa8c9; --water-deep:#2e7d9e;
+    --wood:#8a5a33; --wood-dark:#5e3a1e;
+    --leaf:#5fae52; --leaf-dark:#3e8038;
+    --cream:#fff8e7; --ink:#3a2a1a;
+    --accent:#f4a83f;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:Georgia,'Times New Roman',serif;
+    color:var(--ink);
+    background:linear-gradient(180deg,var(--sky1) 0%,var(--sky2) 18%,#cdeac0 40%,var(--water) 70%,var(--water-deep) 100%);
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:'Comic Sans MS','Segoe Print',Georgia,cursive;line-height:1.15}
+
+  section{
+    min-height:100vh;
+    display:flex;flex-direction:column;justify-content:center;align-items:center;
+    padding:12vh 6vw;text-align:center;position:relative;
+  }
+
+  /* ---------- reveal animation ---------- */
+  .reveal{opacity:0;transform:translateY(60px) scale(.97);transition:opacity 1s ease,transform 1s cubic-bezier(.2,.8,.3,1)}
+  .reveal.visible{opacity:1;transform:none}
+  .reveal.d1{transition-delay:.15s}.reveal.d2{transition-delay:.3s}.reveal.d3{transition-delay:.45s}
+
+  /* ---------- hero ---------- */
+  #hero h1{
+    font-size:clamp(3rem,9vw,7rem);
+    color:var(--wood-dark);
+    text-shadow:3px 3px 0 var(--cream),6px 6px 0 rgba(94,58,30,.25);
+    animation:bob 4s ease-in-out infinite;
+  }
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-1deg)}50%{transform:translateY(-14px) rotate(1deg)}}
+  #hero .tagline{font-size:clamp(1.1rem,2.5vw,1.7rem);margin-top:1.2rem;font-style:italic;color:#4a3520}
+  .scroll-hint{position:absolute;bottom:4vh;font-size:.95rem;color:#4a3520;animation:hint 1.8s ease-in-out infinite}
+  @keyframes hint{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(10px);opacity:1}}
+
+  .btn{
+    display:inline-block;margin-top:2rem;padding:.9rem 2.2rem;
+    font-family:inherit;font-size:1.15rem;font-weight:bold;cursor:pointer;
+    background:var(--accent);color:var(--wood-dark);
+    border:3px solid var(--wood-dark);border-radius:999px;
+    box-shadow:0 5px 0 var(--wood-dark);transition:transform .15s,box-shadow .15s;
+    text-decoration:none;
+  }
+  .btn:hover{transform:translateY(-3px);box-shadow:0 8px 0 var(--wood-dark)}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--wood-dark)}
+
+  /* ---------- cards ---------- */
+  .card{
+    background:var(--cream);border:3px solid var(--wood-dark);border-radius:24px;
+    padding:2.5rem 2rem;max-width:640px;box-shadow:8px 8px 0 rgba(94,58,30,.3);
+  }
+  .card h2{font-size:clamp(1.8rem,4.5vw,2.8rem);color:var(--wood-dark);margin-bottom:1rem}
+  .card p{font-size:1.15rem;line-height:1.65}
+
+  .scene{width:min(720px,92vw);margin-bottom:2.2rem;filter:drop-shadow(0 12px 18px rgba(0,0,0,.18))}
+
+  /* ---------- svg animations ---------- */
+  .float{animation:float 5s ease-in-out infinite}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  .tail{transform-origin:75% 80%;animation:slap 2.2s ease-in-out infinite}
+  @keyframes slap{0%,60%,100%{transform:rotate(0)}70%{transform:rotate(-22deg)}80%{transform:rotate(4deg)}}
+  .ripple{animation:ripple 3s ease-out infinite;transform-origin:center}
+  @keyframes ripple{0%{opacity:.8;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
+  .cloud{animation:drift 40s linear infinite}
+  .cloud.slow{animation-duration:60s}
+  @keyframes drift{from{transform:translateX(-160px)}to{transform:translateX(900px)}}
+  .sway{transform-origin:50% 100%;animation:sway 4.5s ease-in-out infinite}
+  @keyframes sway{0%,100%{transform:rotate(-2.5deg)}50%{transform:rotate(2.5deg)}}
+  .chomp{transform-origin:60% 60%;animation:chomp .7s ease-in-out infinite alternate}
+  @keyframes chomp{from{transform:rotate(0)}to{transform:rotate(-6deg)}}
+  .human-pace{animation:pace 6s ease-in-out infinite}
+  @keyframes pace{0%,100%{transform:translateX(0)}50%{transform:translateX(70px)}}
+
+  /* ---------- footer ---------- */
+  footer{padding:4rem 6vw 6rem;text-align:center;color:var(--cream)}
+  footer a{color:var(--accent)}
+
+  /* ---------- side controls ---------- */
+  .controls{position:fixed;right:18px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:50}
+  .ctl{
+    width:56px;height:56px;border-radius:50%;cursor:pointer;
+    background:var(--cream);border:3px solid var(--wood-dark);color:var(--wood-dark);
+    font-size:1.4rem;box-shadow:0 4px 0 var(--wood-dark);
+    display:flex;align-items:center;justify-content:center;
+    transition:transform .15s,opacity .4s;opacity:0;pointer-events:none;
+  }
+  .ctl.show{opacity:1;pointer-events:auto}
+  .ctl:hover{transform:translateY(-3px)}
+  #tourBtn{opacity:1;pointer-events:auto}
+  #tourBtn.touring{background:var(--accent)}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition-duration:.01ms!important}
+  }
+</style>
+</head>
+<body>
+
+<!-- ================= HERO ================= -->
+<section id="hero">
+  <svg class="scene" viewBox="0 0 800 380" role="img" aria-label="A cheerful beaver on its dam at sunset">
+    <ellipse class="cloud" cx="120" cy="60" rx="60" ry="20" fill="#fff" opacity=".85"/>
+    <ellipse class="cloud slow" cx="40" cy="110" rx="45" ry="15" fill="#fff" opacity=".7"/>
+    <circle cx="650" cy="80" r="46" fill="#ffd76e"/>
+    <circle cx="650" cy="80" r="60" fill="#ffd76e" opacity=".3"/>
+    <!-- water -->
+    <rect y="270" width="800" height="110" fill="#4aa8c9"/>
+    <ellipse class="ripple" cx="400" cy="300" rx="90" ry="12" fill="none" stroke="#bfe8f5" stroke-width="4"/>
+    <ellipse class="ripple" style="animation-delay:1.5s" cx="400" cy="300" rx="90" ry="12" fill="none" stroke="#bfe8f5" stroke-width="4"/>
+    <!-- dam -->
+    <g>
+      <ellipse cx="400" cy="290" rx="170" ry="55" fill="#8a5a33"/>
+      <rect x="260" y="255" width="60" height="14" rx="7" fill="#5e3a1e" transform="rotate(-12 290 262)"/>
+      <rect x="340" y="240" width="70" height="14" rx="7" fill="#a8703f" transform="rotate(8 375 247)"/>
+      <rect x="430" y="250" width="65" height="14" rx="7" fill="#5e3a1e" transform="rotate(-6 462 257)"/>
+    </g>
+    <!-- beaver -->
+    <g class="float">
+      <ellipse class="tail" cx="470" cy="235" rx="42" ry="16" fill="#5e3a1e"/>
+      <ellipse cx="400" cy="210" rx="55" ry="45" fill="#8a5a33"/>
+      <circle cx="400" cy="160" r="32" fill="#8a5a33"/>
+      <circle cx="386" cy="132" r="10" fill="#8a5a33"/>
+      <circle cx="414" cy="132" r="10" fill="#8a5a33"/>
+      <circle cx="389" cy="155" r="4.5" fill="#2b1c0e"/>
+      <circle cx="411" cy="155" r="4.5" fill="#2b1c0e"/>
+      <ellipse cx="400" cy="168" rx="8" ry="6" fill="#3a2a1a"/>
+      <rect x="394" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
+      <rect x="401" y="172" width="5.5" height="10" rx="2" fill="#fff"/>
+    </g>
+  </svg>
+  <h1>Beaverville</h1>
+  <p class="tagline">Beavers vs Humans. The dam war has begun. 🦫</p>
+  <button class="btn" id="tourStart">Take the tour ↓</button>
+  <div class="scroll-hint">scroll down ▾</div>
+</section>
+
+<!-- ================= STORY ================= -->
+<section>
+  <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A peaceful pond with swaying trees">
+    <ellipse class="cloud" cx="200" cy="50" rx="55" ry="18" fill="#fff" opacity=".8"/>
+    <rect y="220" width="800" height="80" fill="#4aa8c9"/>
+    <g class="sway"><rect x="140" y="120" width="16" height="110" fill="#5e3a1e"/><circle cx="148" cy="105" r="52" fill="#5fae52"/></g>
+    <g class="sway" style="animation-delay:1s"><rect x="620" y="130" width="14" height="100" fill="#5e3a1e"/><circle cx="627" cy="118" r="44" fill="#3e8038"/></g>
+    <ellipse class="ripple" cx="400" cy="255" rx="70" ry="10" fill="none" stroke="#bfe8f5" stroke-width="3"/>
+  </svg>
+  <div class="card reveal d1">
+    <h2>Once upon a pond…</h2>
+    <p>Deep in the woods lies Beaverville — a cozy little colony where the water is cool, the birch is crunchy, and every beaver has a dam to call home. Life was perfect. Until the humans showed up.</p>
+  </div>
+</section>
+
+<!-- ================= HUMANS ================= -->
+<section>
+  <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A human surveyor pacing near the pond">
+    <rect y="230" width="800" height="70" fill="#4aa8c9"/>
+    <g class="human-pace">
+      <rect x="360" y="130" width="26" height="60" rx="8" fill="#e05c4b"/>
+      <circle cx="373" cy="112" r="17" fill="#f3c396"/>
+      <rect x="366" y="98" width="15" height="8" rx="3" fill="#f4d03f"/>
+      <rect x="356" y="190" width="9" height="34" fill="#3b5b8a"/>
+      <rect x="381" y="190" width="9" height="34" fill="#3b5b8a"/>
+      <rect x="392" y="140" width="34" height="6" rx="3" fill="#777" transform="rotate(20 392 140)"/>
+    </g>
+    <text x="470" y="120" font-size="26" font-family="Comic Sans MS,cursive" fill="#5e3a1e" transform="rotate(-6 470 120)">"Lovely spot for a parking lot…"</text>
+  </svg>
+  <div class="card reveal d1">
+    <h2>Then came the humans 😤</h2>
+    <p>With clipboards, bulldozers, and absolutely zero respect for quality dam architecture, the humans want to drain the pond. The beavers have other plans. Big, wooden, water-holding plans.</p>
+  </div>
+</section>
+
+<!-- ================= GAMEPLAY ================= -->
+<section>
+  <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A beaver chomping a log">
+    <rect y="230" width="800" height="70" fill="#4aa8c9"/>
+    <g class="chomp">
+      <ellipse cx="380" cy="180" rx="48" ry="38" fill="#8a5a33"/>
+      <circle cx="410" cy="145" r="26" fill="#8a5a33"/>
+      <circle cx="404" cy="140" r="4" fill="#2b1c0e"/>
+      <rect x="416" y="152" width="5" height="9" rx="2" fill="#fff"/>
+    </g>
+    <rect x="430" y="160" width="140" height="22" rx="11" fill="#a8703f"/>
+    <ellipse class="ripple" cx="380" cy="255" rx="60" ry="9" fill="none" stroke="#bfe8f5" stroke-width="3"/>
+  </svg>
+  <div class="card reveal d1">
+    <h2>Chomp. Build. Defend. 🪵</h2>
+    <p>Gnaw down trees, haul logs, and engineer the mightiest dam the forest has ever seen. Outsmart the humans, flood their plans, and protect the colony. Every log counts in the battle for Beaverville.</p>
+  </div>
+</section>
+
+<!-- ================= SCREENSHOTS PLACEHOLDER ================= -->
+<section>
+  <div class="card reveal">
+    <h2>Fresh from the pond 📸</h2>
+    <p>Launch screenshots and gameplay footage are on their way — the beavers are still combing their fur. Check back soon for a first look at Beaverville in action!</p>
+  </div>
+</section>
+
+<!-- ================= CTA ================= -->
+<section>
+  <svg class="scene reveal" viewBox="0 0 800 260" role="img" aria-label="Beaver waving under the moon">
+    <circle cx="640" cy="60" r="34" fill="#fdf6d8"/>
+    <g class="float">
+      <ellipse cx="400" cy="180" rx="50" ry="42" fill="#8a5a33"/>
+      <circle cx="400" cy="132" r="30" fill="#8a5a33"/>
+      <circle cx="390" cy="128" r="4" fill="#2b1c0e"/>
+      <circle cx="410" cy="128" r="4" fill="#2b1c0e"/>
+      <rect x="393" y="145" width="5" height="9" rx="2" fill="#fff"/>
+      <rect x="400" y="145" width="5" height="9" rx="2" fill="#fff"/>
+      <ellipse class="tail" cx="330" cy="150" rx="14" ry="30" fill="#5e3a1e"/>
+    </g>
+  </svg>
+  <div class="card reveal d1">
+    <h2>Join the colony 🏗️</h2>
+    <p>Beaverville is coming to Steam. Wishlist it, tell your friends, and prepare to defend the pond.</p>
+    <a class="btn" href="https://store.steampowered.com/" target="_blank" rel="noopener">Wishlist on Steam</a>
+  </div>
+</section>
+
+<footer>
+  <p>© 2026 Beaverville · Made with 🪵 and stubborn rodent determination</p>
+</footer>
+
+<!-- ================= side controls ================= -->
+<div class="controls">
+  <button class="ctl" id="tourBtn" title="Auto-scroll tour">▶</button>
+  <button class="ctl" id="topBtn" title="Back to top">↑</button>
+</div>
+
+<script>
+  // scroll-triggered reveals
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.25 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // back-to-top button (appears after first screen)
+  const topBtn = document.getElementById('topBtn');
+  addEventListener('scroll', () => {
+    topBtn.classList.toggle('show', scrollY > innerHeight * 0.6);
+  }, { passive: true });
+  topBtn.addEventListener('click', () => scrollTo({ top: 0, behavior: 'smooth' }));
+
+  // auto-scroll tour: glides down the page, pausing at each section
+  const tourBtn = document.getElementById('tourBtn');
+  const sections = [...document.querySelectorAll('section')];
+  let touring = false, tourTimer = null;
+
+  function stopTour() {
+    touring = false;
+    clearTimeout(tourTimer);
+    tourBtn.textContent = '▶';
+    tourBtn.classList.remove('touring');
+  }
+  function tourStep(i) {
+    if (!touring) return;
+    if (i >= sections.length) { stopTour(); return; }
+    sections[i].scrollIntoView({ behavior: 'smooth' });
+    tourTimer = setTimeout(() => tourStep(i + 1), 4200);
+  }
+  function startTour(fromTop) {
+    touring = true;
+    tourBtn.textContent = '⏸';
+    tourBtn.classList.add('touring');
+    tourStep(fromTop ? 1 : sections.findIndex(s => s.getBoundingClientRect().top > 10));
+  }
+  tourBtn.addEventListener('click', () => touring ? stopTour() : startTour(false));
+  document.getElementById('tourStart').addEventListener('click', () => startTour(true));
+  // any manual scroll input cancels the tour
+  ['wheel', 'touchstart', 'keydown'].forEach(ev =>
+    addEventListener(ev, () => { if (touring) stopTour(); }, { passive: true }));
+</script>
+</body>
+</html>
