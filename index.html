@@ -79,10 +79,11 @@
   /* ---------- svg animations ---------- */
   .float{animation:float 5s ease-in-out infinite}
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-  .hop{animation:hop 1.6s cubic-bezier(.4,0,.6,1) infinite}
-  @keyframes hop{0%,100%{transform:translateY(0) scale(1,1)}12%{transform:translateY(2px) scale(1.04,.94)}40%{transform:translateY(-26px) scale(.97,1.04)}70%{transform:translateY(0) scale(1,1)}82%{transform:translateY(1px) scale(1.03,.96)}}
-  .nod{transform-origin:50% 85%;animation:nod 2.4s ease-in-out infinite}
-  @keyframes nod{0%,100%{transform:rotate(0)}30%{transform:rotate(7deg)}60%{transform:rotate(-4deg)}}
+  .wag{transform-box:fill-box;transform-origin:left center;animation:wag 1.8s ease-in-out infinite}
+  @keyframes wag{0%,100%{transform:rotate(0)}25%{transform:rotate(-10deg)}75%{transform:rotate(8deg)}}
+  .chip{opacity:0;animation:chipfly 1.4s ease-out infinite}
+  .chip.c2{animation-delay:.4s}.chip.c3{animation-delay:.8s}
+  @keyframes chipfly{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:1}100%{opacity:0;transform:translate(-30px,-45px) rotate(140deg)}}
   .ripple{animation:ripple 3s ease-out infinite;transform-origin:center}
   @keyframes ripple{0%{opacity:.8;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
   .cloud{animation:drift 40s linear infinite}
@@ -141,10 +142,10 @@
       <rect x="430" y="250" width="65" height="14" rx="7" fill="#5e3a1e" transform="rotate(-6 462 257)"/>
     </g>
     <!-- beaver -->
-    <g class="hop">
-      <ellipse cx="448" cy="228" rx="38" ry="15" fill="#5e3a1e"/>
+    <g>
+      <ellipse class="wag" cx="448" cy="228" rx="38" ry="15" fill="#5e3a1e"/>
       <ellipse cx="400" cy="210" rx="55" ry="45" fill="#8a5a33"/>
-      <g class="nod">
+      <g>
         <circle cx="400" cy="160" r="32" fill="#8a5a33"/>
         <circle cx="386" cy="132" r="10" fill="#8a5a33"/>
         <circle cx="414" cy="132" r="10" fill="#8a5a33"/>
@@ -188,12 +189,25 @@
   <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A human surveyor pacing near the pond">
     <rect y="230" width="800" height="70" fill="#4aa8c9"/>
     <g class="human-pace">
-      <rect x="360" y="130" width="26" height="60" rx="8" fill="#e05c4b"/>
+      <!-- body: blue-gray shirt, dark pants -->
+      <rect x="358" y="132" width="30" height="56" rx="8" fill="#5a6b7a"/>
+      <rect x="358" y="150" width="30" height="10" fill="#8a5a33"/>
+      <rect x="356" y="188" width="10" height="36" fill="#2e3a4a"/>
+      <rect x="380" y="188" width="10" height="36" fill="#2e3a4a"/>
+      <!-- head with mustache -->
       <circle cx="373" cy="112" r="17" fill="#f3c396"/>
-      <rect x="366" y="98" width="15" height="8" rx="3" fill="#f4d03f"/>
-      <rect x="356" y="190" width="9" height="34" fill="#3b5b8a"/>
-      <rect x="381" y="190" width="9" height="34" fill="#3b5b8a"/>
-      <rect x="392" y="140" width="34" height="6" rx="3" fill="#777" transform="rotate(20 392 140)"/>
+      <circle cx="367" cy="108" r="2.5" fill="#2b1c0e"/>
+      <circle cx="379" cy="108" r="2.5" fill="#2b1c0e"/>
+      <ellipse cx="373" cy="120" rx="10" ry="4.5" fill="#6b4423"/>
+      <!-- dark hat -->
+      <rect x="354" y="96" width="38" height="6" rx="3" fill="#2b2b33"/>
+      <rect x="361" y="80" width="24" height="18" rx="3" fill="#2b2b33"/>
+      <!-- trusty rifle, held sideways -->
+      <g transform="rotate(-8 373 150)">
+        <rect x="340" y="146" width="70" height="7" rx="3" fill="#6b4423"/>
+        <rect x="400" y="144" width="22" height="5" rx="2" fill="#444"/>
+        <rect x="362" y="152" width="8" height="10" rx="2" fill="#5a3a1e"/>
+      </g>
     </g>
     <text x="470" y="120" font-size="26" font-family="Comic Sans MS,cursive" fill="#5e3a1e" transform="rotate(-6 470 120)">"Lovely spot for a parking lot…"</text>
   </svg>
@@ -205,22 +219,42 @@
 
 <!-- ================= GAMEPLAY ================= -->
 <section>
-  <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A beaver chomping a log">
+  <svg class="scene reveal" viewBox="0 0 800 300" role="img" aria-label="A happy beaver in a top hat gnawing a log, wood chips flying">
     <rect y="230" width="800" height="70" fill="#4aa8c9"/>
+    <!-- log leaning into the beaver's mouth -->
+    <g transform="rotate(18 470 185)">
+      <rect x="440" y="174" width="150" height="26" rx="13" fill="#a8703f"/>
+      <ellipse cx="590" cy="187" rx="9" ry="13" fill="#e8c79a"/>
+      <circle cx="590" cy="187" r="4" fill="#c49a66"/>
+    </g>
+    <!-- wood chips flying -->
+    <g fill="#d9a86a">
+      <rect class="chip c1" x="430" y="150" width="10" height="5" rx="2"/>
+      <rect class="chip c2" x="445" y="140" width="8" height="5" rx="2"/>
+      <rect class="chip c3" x="425" y="132" width="7" height="4" rx="2"/>
+    </g>
+    <!-- beaver, front-facing and cute -->
     <g class="chomp">
-      <ellipse cx="380" cy="180" rx="48" ry="38" fill="#8a5a33"/>
-      <circle cx="410" cy="145" r="26" fill="#8a5a33"/>
-      <circle cx="404" cy="140" r="4" fill="#2b1c0e"/>
-      <rect x="416" y="152" width="5" height="9" rx="2" fill="#fff"/>
+      <ellipse class="wag" style="transform-origin:right center;animation-delay:.9s" cx="365" cy="212" rx="30" ry="13" fill="#5e3a1e"/>
+      <ellipse cx="395" cy="192" rx="46" ry="38" fill="#8a5a33"/>
+      <circle cx="400" cy="150" r="28" fill="#8a5a33"/>
+      <circle cx="388" cy="126" r="8" fill="#8a5a33"/>
+      <circle cx="412" cy="126" r="8" fill="#8a5a33"/>
+      <circle cx="391" cy="146" r="4" fill="#2b1c0e"/>
+      <circle cx="409" cy="146" r="4" fill="#2b1c0e"/>
+      <ellipse cx="384" cy="156" rx="5" ry="3.5" fill="#e59a9a" opacity=".7"/>
+      <ellipse cx="416" cy="156" rx="5" ry="3.5" fill="#e59a9a" opacity=".7"/>
+      <ellipse cx="400" cy="158" rx="7" ry="5" fill="#3a2a1a"/>
+      <rect x="394" y="162" width="5.5" height="10" rx="2" fill="#fff"/>
+      <rect x="401" y="162" width="5.5" height="10" rx="2" fill="#fff"/>
       <!-- tiny top hat -->
-      <g transform="rotate(-14 410 120)">
-        <rect x="390" y="120" width="40" height="6" rx="3" fill="#2b2b33"/>
-        <rect x="397" y="99" width="26" height="23" rx="3" fill="#2b2b33"/>
-        <rect x="397" y="113" width="26" height="5" fill="#f4a83f"/>
+      <g transform="rotate(-10 400 118)">
+        <rect x="378" y="116" width="44" height="7" rx="3.5" fill="#2b2b33"/>
+        <rect x="385" y="93" width="30" height="25" rx="4" fill="#2b2b33"/>
+        <rect x="385" y="108" width="30" height="5" fill="#f4a83f"/>
       </g>
     </g>
-    <rect x="430" y="160" width="140" height="22" rx="11" fill="#a8703f"/>
-    <ellipse class="ripple" cx="380" cy="255" rx="60" ry="9" fill="none" stroke="#bfe8f5" stroke-width="3"/>
+    <ellipse class="ripple" cx="395" cy="255" rx="60" ry="9" fill="none" stroke="#bfe8f5" stroke-width="3"/>
   </svg>
   <div class="card reveal d1">
     <h2>Chomp. Build. Defend. 🪵</h2>
@@ -230,9 +264,11 @@
 
 <!-- ================= SCREENSHOTS PLACEHOLDER ================= -->
 <section>
-  <div class="card reveal">
+  <img class="reveal" src="img/funnyguy.png" alt="In-game screenshot: a mustachioed human in a dark hat patrols a rooftop with his rifle, pine forest behind him"
+       style="width:min(440px,85vw);border:4px solid var(--wood-dark);border-radius:20px;box-shadow:10px 10px 0 rgba(94,58,30,.3);margin-bottom:2rem">
+  <div class="card reveal d1">
     <h2>Fresh from the pond 📸</h2>
-    <p>Launch screenshots and gameplay footage are on their way — the beavers are still combing their fur. Check back soon for a first look at Beaverville in action!</p>
+    <p>Meet the enemy: mustachioed, well-armed, and suspiciously fond of rooftops. More launch screenshots and gameplay footage coming soon — the beavers are still combing their fur.</p>
   </div>
 </section>
 
@@ -240,10 +276,10 @@
 <section>
   <svg class="scene reveal" viewBox="0 0 800 260" role="img" aria-label="Beaver waving under the moon">
     <circle cx="640" cy="60" r="34" fill="#fdf6d8"/>
-    <g class="hop" style="animation-delay:.3s">
-      <ellipse cx="356" cy="196" rx="34" ry="14" fill="#5e3a1e"/>
+    <g>
+      <ellipse class="wag" style="animation-delay:.5s;transform-origin:right center" cx="356" cy="196" rx="34" ry="14" fill="#5e3a1e"/>
       <ellipse cx="400" cy="180" rx="50" ry="42" fill="#8a5a33"/>
-      <g class="nod">
+      <g>
         <circle cx="400" cy="132" r="30" fill="#8a5a33"/>
         <circle cx="390" cy="128" r="4" fill="#2b1c0e"/>
         <circle cx="410" cy="128" r="4" fill="#2b1c0e"/>
