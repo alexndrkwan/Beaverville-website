@@ -428,15 +428,23 @@
       if (!audioCtx) {
         audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         master = audioCtx.createGain();
-        master.gain.value = 0.55;
         master.connect(audioCtx.destination);
       }
       audioCtx.resume();
+      // ease in gently — never startle the customer
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+      master.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 3);
       nextBar = audioCtx.currentTime + 0.1; barCount = 0;
       scheduler();
       playing = true; musicBtn.textContent = '🔇'; musicBtn.title = 'Music off';
     } else {
-      clearTimeout(schedTimer); audioCtx.suspend();
+      clearTimeout(schedTimer);
+      // quick fade-out instead of a harsh cut
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.setValueAtTime(master.gain.value, audioCtx.currentTime);
+      master.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+      setTimeout(() => audioCtx.suspend(), 450);
       playing = false; musicBtn.textContent = '🎵'; musicBtn.title = 'Music on';
     }
   }
