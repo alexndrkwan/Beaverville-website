@@ -449,6 +449,24 @@
     }
   }
   musicBtn.addEventListener('click', toggleMusic);
+
+  // auto-start music on the visitor's first interaction (scroll, tap, key).
+  // Browsers block audio until a real gesture; wheel doesn't count everywhere,
+  // so we keep trying until one sticks. Muting afterwards stays muted.
+  let userMuted = false;
+  musicBtn.addEventListener('click', () => { if (!playing) userMuted = true; });
+  function autoStart(e) {
+    if (e.target.closest && e.target.closest('.controls, #tourStart')) return; // buttons handle music themselves
+    if (playing || userMuted) return done();
+    toggleMusic();
+    if (audioCtx.state === 'running') done();
+    else { clearTimeout(schedTimer); playing = false; musicBtn.textContent = '🎵'; } // blocked — retry on next gesture
+    function done() {
+      ['wheel','touchend','keydown','pointerdown'].forEach(ev => removeEventListener(ev, autoStart));
+    }
+  }
+  ['wheel','touchend','keydown','pointerdown'].forEach(ev =>
+    addEventListener(ev, autoStart, { passive: true }));
   // any manual scroll input cancels the tour
   ['wheel', 'touchstart', 'keydown'].forEach(ev =>
     addEventListener(ev, () => { if (touring) stopTour(); }, { passive: true }));
