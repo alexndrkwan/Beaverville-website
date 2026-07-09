@@ -517,55 +517,59 @@
     }
     schedTimer = setTimeout(scheduler, 200);
   }
-  let suspendTimer = null;
-  function startMusic() {
-    if (playing) return;
-    if (!audioCtx) {
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      master = audioCtx.createGain();
-      master.connect(audioCtx.destination);
-    }
-    clearTimeout(suspendTimer);
-    // resume() waits for a valid user gesture if the browser requires one
-    audioCtx.resume().then(() => {
-      if (playing || userMuted) return;
-      // ease in gently — never startle the customer
-      master.gain.cancelScheduledValues(audioCtx.currentTime);
-      master.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-      master.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 3);
-      nextBar = audioCtx.currentTime + 0.1; barCount = 0;
-      scheduler();
-      playing = true; musicBtn.textContent = '🔇'; musicBtn.title = 'Music off';
-    }).catch(() => {});
+  // `wanted` = should music be playing; audio actually flows once the
+  // browser lets the context reach 'running'. Notes are only scheduled
+  // while running, so nothing piles up or blasts on unlock.
+  let wanted = true, suspendTimer = null;
+
+  function ensureCtx() {
+    if (audioCtx) return;
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    master = audioCtx.createGain();
+    master.connect(audioCtx.destination);
+    audioCtx.onstatechange = () => { if (audioCtx.state === 'running' && wanted && !playing) begin(); };
   }
-  function stopMusic() {
-    if (!playing) return;
-    clearTimeout(schedTimer);
-    // quick fade-out instead of a harsh cut
+  function begin() {
+    playing = true;
+    // ease in gently — never startle the customer
     master.gain.cancelScheduledValues(audioCtx.currentTime);
-    master.gain.setValueAtTime(master.gain.value, audioCtx.currentTime);
-    master.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
-    suspendTimer = setTimeout(() => { if (!playing) audioCtx.suspend(); }, 450);
-    playing = false; musicBtn.textContent = '🎵'; musicBtn.title = 'Music on';
+    master.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+    master.gain.exponentialRampToValueAtTime(0.35, audioCtx.currentTime + 3);
+    nextBar = audioCtx.currentTime + 0.1; barCount = 0;
+    scheduler();
+    musicBtn.textContent = '🔇'; musicBtn.title = 'Music off';
   }
-  function toggleMusic() { playing ? (userMuted = true, stopMusic()) : startMusic(); }
-  let userMuted = false;
+  function toggleMusic() {
+    ensureCtx();
+    if (!playing) {
+      wanted = true;
+      clearTimeout(suspendTimer);
+      if (audioCtx.state === 'running') begin();
+      else audioCtx.resume();
+    } else {
+      wanted = false; playing = false;
+      clearTimeout(schedTimer);
+      // quick fade-out instead of a harsh cut
+      master.gain.cancelScheduledValues(audioCtx.currentTime);
+      master.gain.setValueAtTime(master.gain.value, audioCtx.currentTime);
+      master.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.4);
+      suspendTimer = setTimeout(() => { if (!playing) audioCtx.suspend(); }, 450);
+      musicBtn.textContent = '🎵'; musicBtn.title = 'Music on';
+    }
+  }
   musicBtn.addEventListener('click', toggleMusic);
 
-  // Autoplay ASAP: ask the browser right away — resume() stays pending until
-  // the browser allows sound, then the 3s fade-in kicks off automatically.
-  // Gesture listeners below nudge browsers that need a fresh attempt per gesture.
-  startMusic();
-  function autoStart(e) {
+  // Autoplay: try immediately (works for trusted return visitors), then
+  // keep nudging on every gesture until the browser unlocks audio.
+  ensureCtx(); audioCtx.resume();
+  function nudge(e) {
     if (e.target.closest && e.target.closest('.controls, #tourStart')) return;
-    if (userMuted || playing) {
-      ['touchend','keydown','pointerdown','click'].forEach(ev => removeEventListener(ev, autoStart));
-      return;
-    }
-    startMusic();
+    if (playing || !wanted) return;
+    audioCtx.resume();
+    if (audioCtx.state === 'running' && !playing) begin();
   }
-  ['touchend','keydown','pointerdown','click'].forEach(ev =>
-    addEventListener(ev, autoStart, { passive: true }));
+  ['touchend','keydown','pointerdown','click','wheel'].forEach(ev =>
+    addEventListener(ev, nudge, { passive: true }));
   // any manual scroll input cancels the tour
   ['wheel', 'touchstart', 'keydown'].forEach(ev =>
     addEventListener(ev, () => { if (touring) stopTour(); }, { passive: true }));
