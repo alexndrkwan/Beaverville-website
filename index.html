@@ -319,6 +319,7 @@
 
 <!-- ================= side controls ================= -->
 <div class="controls">
+  <button class="ctl" id="musicBtn" title="Music on/off" style="opacity:1;pointer-events:auto">🎵</button>
   <button class="ctl" id="tourBtn" title="Auto-scroll tour">▶</button>
   <button class="ctl" id="topBtn" title="Back to top">↑</button>
 </div>
@@ -361,7 +362,85 @@
     tourStep(fromTop ? 1 : sections.findIndex(s => s.getBoundingClientRect().top > 10));
   }
   tourBtn.addEventListener('click', () => touring ? stopTour() : startTour(false));
-  document.getElementById('tourStart').addEventListener('click', () => startTour(true));
+  document.getElementById('tourStart').addEventListener('click', () => { startTour(true); if (!playing) toggleMusic(); });
+
+  // ============ generated soundtrack: "The Dam Builder's Waltz" ============
+  // Whimsical 6/8 indie-adventure loop, composed in code via Web Audio.
+  const musicBtn = document.getElementById('musicBtn');
+  let audioCtx = null, master = null, playing = false, nextBar = 0, schedTimer = null, barCount = 0;
+
+  const N = n => 440 * Math.pow(2, (n - 69) / 12); // midi -> Hz
+  // D major, four-bar progression: D, Bm, G, A
+  const CHORDS = [[62,66,69],[59,62,66],[55,59,62],[57,61,64]];
+  const BASS   = [38, 35, 43, 45];
+  // pentatonic-ish melody, two 4-bar phrases (midi, beat-in-bar 0..5, len in beats)
+  const MELODY = [
+    [[74,0,2],[78,2,1],[81,3,3]],          [[78,0,2],[74,2,1],[71,3,3]],
+    [[67,0,2],[71,2,1],[74,3,2],[78,5,1]], [[76,0,3],[73,3,3]],
+    [[81,0,2],[83,2,1],[86,3,3]],          [[83,0,2],[81,2,1],[78,3,3]],
+    [[74,0,2],[78,2,1],[81,3,2],[83,5,1]], [[86,0,6]],
+  ];
+
+  function pluck(freq, t, dur, vol, type) { // marimba/pizz-style voice
+    const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05);
+  }
+  function bell(freq, t, dur, vol) { // glockenspiel: sine + faint octave sparkle
+    pluck(freq, t, dur, vol, 'sine');
+    pluck(freq * 2, t, dur * 0.6, vol * 0.25, 'sine');
+  }
+  function shaker(t, vol) {
+    const len = 0.06, buf = audioCtx.createBuffer(1, audioCtx.sampleRate * len, audioCtx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const s = audioCtx.createBufferSource(), g = audioCtx.createGain(), f = audioCtx.createBiquadFilter();
+    s.buffer = buf; f.type = 'highpass'; f.frequency.value = 6000; g.gain.value = vol;
+    s.connect(f); f.connect(g); g.connect(master); s.start(t);
+  }
+
+  function scheduleBar(t, bar) {
+    const spb = 60 / 168; // 6/8 at a skippy 168 eighth-notes/min
+    const chord = CHORDS[bar % 4];
+    pluck(N(BASS[bar % 4]), t, spb * 5, 0.22, 'triangle');               // warm bass on the downbeat
+    for (let b = 0; b < 6; b++) {                                        // arpeggio pattern
+      pluck(N(chord[[0,2,1,2,0,1][b]] ), t + b * spb, spb * 1.6, 0.10, 'triangle');
+      if (b === 0 || b === 3) shaker(t + b * spb, 0.05);                 // gentle 6/8 sway
+      else if (b === 2 || b === 5) shaker(t + b * spb, 0.02);
+    }
+    if (bar >= 4)                                                        // melody enters after a 4-bar intro
+      for (const [note, beat, len] of MELODY[bar % 8])
+        bell(N(note), t + beat * spb, len * spb * 1.2, 0.13);
+  }
+  function scheduler() {
+    const spb = 60 / 168, barLen = spb * 6;
+    while (nextBar < audioCtx.currentTime + 0.5) {
+      scheduleBar(nextBar, barCount++);
+      nextBar += barLen;
+    }
+    schedTimer = setTimeout(scheduler, 200);
+  }
+  function toggleMusic() {
+    if (!playing) {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        master = audioCtx.createGain();
+        master.gain.value = 0.55;
+        master.connect(audioCtx.destination);
+      }
+      audioCtx.resume();
+      nextBar = audioCtx.currentTime + 0.1; barCount = 0;
+      scheduler();
+      playing = true; musicBtn.textContent = '🔇'; musicBtn.title = 'Music off';
+    } else {
+      clearTimeout(schedTimer); audioCtx.suspend();
+      playing = false; musicBtn.textContent = '🎵'; musicBtn.title = 'Music on';
+    }
+  }
+  musicBtn.addEventListener('click', toggleMusic);
   // any manual scroll input cancels the tour
   ['wheel', 'touchstart', 'keydown'].forEach(ev =>
     addEventListener(ev, () => { if (touring) stopTour(); }, { passive: true }));
