@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Beaverville — Beavers vs Humans</title>
 <meta name="description" content="Beaverville: a whimsical game of beavers, dams, and the humans who dare disturb them. Coming to Steam.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A6%AB%3C/text%3E%3C/svg%3E">
@@ -34,6 +34,7 @@
 
   section{
     min-height:100vh;
+    min-height:100svh; /* small-viewport height: excludes the mobile browser bar */
     display:flex;flex-direction:column;justify-content:center;align-items:center;
     padding:12vh 6vw;text-align:center;position:relative;
   }
@@ -84,7 +85,7 @@
   .chip{opacity:0;animation:chipfly 1.4s ease-out infinite}
   .chip.c2{animation-delay:.4s}.chip.c3{animation-delay:.8s}
   @keyframes chipfly{0%{opacity:0;transform:translate(0,0) rotate(0)}15%{opacity:1}100%{opacity:0;transform:translate(-30px,-45px) rotate(140deg)}}
-  .ripple{animation:ripple 3s ease-out infinite;transform-origin:center}
+  .ripple{animation:ripple 3s ease-out infinite;transform-box:fill-box;transform-origin:center}
   @keyframes ripple{0%{opacity:.8;transform:scale(.4)}100%{opacity:0;transform:scale(1.6)}}
   .cloud{animation:drift 40s linear infinite}
   .cloud.slow{animation-duration:60s}
@@ -101,7 +102,7 @@
   footer a{color:var(--accent)}
 
   /* ---------- side controls ---------- */
-  .controls{position:fixed;right:18px;bottom:24px;display:flex;flex-direction:column;gap:12px;z-index:50}
+  .controls{position:fixed;right:18px;bottom:calc(24px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;z-index:50}
   .ctl{
     width:56px;height:56px;border-radius:50%;cursor:pointer;
     background:var(--cream);border:3px solid var(--wood-dark);color:var(--wood-dark);
@@ -113,6 +114,19 @@
   .ctl:hover{transform:translateY(-3px)}
   #tourBtn{opacity:1;pointer-events:auto}
   #tourBtn.touring{background:var(--accent)}
+
+  /* ---------- mobile ---------- */
+  @media (max-width:640px){
+    section{padding:7vh 5vw;min-height:100vh;min-height:100svh;justify-content:center}
+    .scene{margin-bottom:1.4rem}
+    .card{padding:1.6rem 1.2rem;border-radius:18px;box-shadow:5px 5px 0 rgba(94,58,30,.3)}
+    .card p{font-size:1rem;line-height:1.55}
+    #hero h1{text-shadow:2px 2px 0 var(--cream),4px 4px 0 rgba(94,58,30,.25)}
+    .scroll-hint{bottom:2vh}
+    .controls{right:12px;bottom:16px;gap:9px}
+    .ctl{width:46px;height:46px;font-size:1.15rem}
+    .btn{margin-top:1.4rem;padding:.8rem 1.8rem;font-size:1.05rem}
+  }
 
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition-duration:.01ms!important}
