@@ -119,6 +119,8 @@
   @media (max-width:640px){
     section{padding:7vh 5vw;min-height:100vh;min-height:100svh;justify-content:center}
     .scene{margin-bottom:1.4rem}
+    /* posters/screenshots: cap height so the image AND its card share one screen */
+    section > img{max-height:38vh;max-height:38svh;width:auto!important;max-width:85vw;margin-bottom:1.2rem!important}
     .card{padding:1.6rem 1.2rem;border-radius:18px;box-shadow:5px 5px 0 rgba(94,58,30,.3)}
     .card p{font-size:1rem;line-height:1.55}
     #hero h1{text-shadow:2px 2px 0 var(--cream),4px 4px 0 rgba(94,58,30,.25)}
@@ -447,7 +449,7 @@
   // scroll-triggered reveals
   const io = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-  }, { threshold: 0.25 });
+  }, { threshold: 0.12, rootMargin: '0px 0px -8% 0px' });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
 
   // back-to-top button (appears after first screen)
